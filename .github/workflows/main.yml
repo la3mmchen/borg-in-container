@@ -29,11 +29,11 @@ jobs:
           docker buildx build \
             --build-arg version=${{ github.sha }} \
             --platform linux/amd64,linux/arm64,linux/386,linux/arm/v7,linux/arm/v6 \
-            --tag la3mmchen/borg-in-container:${{ github.sha }} \
+            --tag ghcr.io/la3mmchen/borg-in-container:${{ github.sha }} \
             --file Dockerfile \
             -- .
           docker image ls
-          docker push la3mmchen/borg-in-container:${{ github.sha }}
+          docker push ghcr.io/la3mmchen/borg-in-container:${{ github.sha }}
 
 #   publish-latest:
 #     if: github.ref == 'refs/heads/main'
