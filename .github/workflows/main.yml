@@ -33,10 +33,11 @@ jobs:
             --file Dockerfile \
             -- .
 
+      - name: login
+        run: echo ${{ secrets.PUSHTOKEN }} | docker login ghcr.io -u ${{ github.ACTOR }} --password-stdin
+
       - name: push
-        run: |
-          echo ${{ secrets.PUSHTOKEN }} | docker login ghcr.io -u ${{ github.ACTOR }} --password-stdin
-          docker push ghcr.io/la3mmchen/borg-in-container:${{ github.GITHUB_REF }}
+        run: docker push ghcr.io/la3mmchen/borg-in-container:${{ github.GITHUB_REF }}
 
 #   publish-latest:
 #     if: github.ref == 'refs/heads/main'
