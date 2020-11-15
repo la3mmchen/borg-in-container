@@ -1,64 +1,55 @@
+---
 name: cd
-on: [ push ]
+on: [push]
 
 jobs:
 
-  docker-buildx:
+  docker-buildx-push:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v1
-      with:
-        platforms: all
-    
-    - name: setup buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v1
-      with:
-        version: latest
-    
-    - name: debug available platforms
-      run: echo ${{ steps.buildx.outputs.platforms }}
-    
-    - name: Run Buildx
-      run: |
-        docker buildx build \
-          --build-arg version=${{ github.sha }} \
-          --platform linux/amd64,linux/arm64,linux/386,linux/arm/v7,linux/arm/v6 \
-          --output "type=image,push=false" \
-          --tag la3mmchen/borg-in-container:latest \
-          --file Dockerfile \
-          -- .
+      - uses: actions/checkout@v1
 
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1 
-    - name: print commit sha
-      run: echo ${{ github.sha }}
-    - name: push the image
-      uses: mr-smithers-excellent/docker-build-push@v4
-      with:
-        tag: ${{ github.GITHUB_REF }}
-        image: la3mmchen/borg-in-container
-        registry: ghcr.io
-        username: ${{ github.ACTOR }}
-        password: ${{ secrets.PUSHTOKEN }} 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+        with:
+          platforms: all
 
-  publish-latest:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1 
-    - name: print commit sha
-      run: echo ${{ github.sha }}
-    - name: push the image
-      uses: mr-smithers-excellent/docker-build-push@v4
-      with:
-        tag: lastest
-        image: la3mmchen/borg-in-container
-        registry: ghcr.io
-        username: ${{ github.ACTOR }}
-        password: ${{ secrets.PUSHTOKEN }} 
+      - name: setup buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+
+      - name: debug available platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
+
+      - name: buildx
+        run: |
+          docker buildx build \
+            --build-arg version=${{ github.sha }} \
+            --platform linux/amd64,linux/arm64,linux/386,linux/arm/v7,linux/arm/v6 \
+            --output "type=image,push=false" \
+            --tag la3mmchen/borg-in-container:latest \
+            --file Dockerfile \
+            -- .
+
+      - name: push
+        run: |
+          echo ${{ secrets.PUSHTOKEN }} | docker login ghcr.io -u ${{ github.ACTOR }} --password-stdin
+          docker push ghcr.io/la3mmchen/borg-in-container:${{ github.GITHUB_REF }}
+
+#   publish-latest:
+#     if: github.ref == 'refs/heads/main'
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@v1
+#     - name: print commit sha
+#       run: echo ${{ github.sha }}
+#     - name: push the image
+#       uses: mr-smithers-excellent/docker-build-push@v4
+#       with:
+#         tag: lastest
+#         image: la3mmchen/borg-in-container
+#         registry: ghcr.io
+#         username: ${{ github.ACTOR }}
+#         password: ${{ secrets.PUSHTOKEN }}
