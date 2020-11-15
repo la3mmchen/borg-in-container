@@ -32,12 +32,7 @@ jobs:
             --tag la3mmchen/borg-in-container:${{ github.sha }} \
             --file Dockerfile \
             -- .
-      
-      - name: list image
-        run: docker image ls
-      
-      - name: login-push
-        run: |
+          docker image ls
           echo ${{ secrets.PUSHTOKEN }} | docker login ghcr.io -u ${{ github.ACTOR }} --password-stdin
           docker push la3mmchen/borg-in-container:${{ github.sha }}
 
