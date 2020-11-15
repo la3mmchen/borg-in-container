@@ -14,6 +14,9 @@ jobs:
         with:
           platforms: all
 
+      - name: define tag
+        run: echo "image_tag=--tag ghcr.io/la3mmchen/borg-in-container:${{ github.sha }}" >> $GITHUB_ENV
+
       - name: setup buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
@@ -30,7 +33,7 @@ jobs:
             --build-arg version=${{ github.sha }} \
             --output "type=registry" \
             --platform linux/amd64,linux/arm64,linux/386,linux/arm/v7,linux/arm/v6 \
-            --tag ghcr.io/la3mmchen/borg-in-container:${{ github.sha }} \
+            ${{ env.image_tag }} \
             --file Dockerfile \
             -- .
 
