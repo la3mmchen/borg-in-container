@@ -3,12 +3,26 @@ on: [ push ]
 
 jobs:
 
-  docker-build:
+  docker-buildx:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: docker build
-      run: docker build --build-arg version=${{ github.sha }} --file Dockerfile --tag la3mmchen/borg-in-container:latest .
+    - name: setup buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v1
+      with:
+        version: latest
+    - name: debug available platforms
+      run: echo ${{ steps.buildx.outputs.platforms }}
+    - name: Run Buildx
+      run: |
+        docker buildx build \
+          --build-arg version=${{ github.sha }} \
+          --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x \
+          --output "type=image,push=false" \
+          --tag la3mmchen/borg-in-container:latest \
+          --file Dockerfile \
+          -- .
 
   publish:
     runs-on: ubuntu-latest
