@@ -23,7 +23,7 @@ jobs:
       - name: debug available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
 
-      - name: buildx
+      - name: buildx-and-push
         run: |
           docker buildx build \
             --build-arg version=${{ github.sha }} \
@@ -32,12 +32,8 @@ jobs:
             --tag la3mmchen/borg-in-container:${{ github.sha }} \
             --file Dockerfile \
             -- .
-
-      - name: login
-        run: echo ${{ secrets.PUSHTOKEN }} | docker login ghcr.io -u ${{ github.ACTOR }} --password-stdin
-
-      - name: push
-        run: docker push ghcr.io/la3mmchen/borg-in-container:${{ github.sha }}
+          echo ${{ secrets.PUSHTOKEN }} | docker login ghcr.io -u ${{ github.ACTOR }} --password-stdin
+          docker push ghcr.io/la3mmchen/borg-in-container:${{ github.sha }}
 
 #   publish-latest:
 #     if: github.ref == 'refs/heads/main'
