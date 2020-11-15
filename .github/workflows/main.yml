@@ -25,6 +25,7 @@ jobs:
 
       - name: buildx-and-push
         run: |
+          echo ${{ secrets.PUSHTOKEN }} | docker login ghcr.io -u ${{ github.ACTOR }} --password-stdin
           docker buildx build \
             --build-arg version=${{ github.sha }} \
             --platform linux/amd64,linux/arm64,linux/386,linux/arm/v7,linux/arm/v6 \
@@ -32,7 +33,6 @@ jobs:
             --file Dockerfile \
             -- .
           docker image ls
-          echo ${{ secrets.PUSHTOKEN }} | docker login ghcr.io -u ${{ github.ACTOR }} --password-stdin
           docker push la3mmchen/borg-in-container:${{ github.sha }}
 
 #   publish-latest:
