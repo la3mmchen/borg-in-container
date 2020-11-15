@@ -29,9 +29,10 @@ jobs:
             --build-arg version=${{ github.sha }} \
             --platform linux/amd64,linux/arm64,linux/386,linux/arm/v7,linux/arm/v6 \
             --output "type=image,push=false" \
-            --tag la3mmchen/borg-in-container:${{ github.sha }} \
+            --tag ghcr.io/la3mmchen/borg-in-container:${{ github.sha }} \
             --file Dockerfile \
             -- .
+          docker images ls
           echo ${{ secrets.PUSHTOKEN }} | docker login ghcr.io -u ${{ github.ACTOR }} --password-stdin
           docker push ghcr.io/la3mmchen/borg-in-container:${{ github.sha }}
 
